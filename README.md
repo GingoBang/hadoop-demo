@@ -1,21 +1,10 @@
-# Hadoop Chart
-
-This chart is modified from [stable/hadoop](https://github.com/helm/charts/tree/master/stable/hadoop) and [mgit-at/helm-hadoop-3](https://github.com/mgit-at/helm-hadoop-3) and has been updated to:
-
-- run use multi-architecture Docker image and
-- use the currently latest version of Hadoop.
-
-This chart is primarily intended to be used for YARN and MapReduce job execution where HDFS is just used as a means to transport small artifacts within the framework and not for a distributed filesystem. Data should be read from cloud based datastores such as Google Cloud Storage, S3 or Swift.
-
-## Chart Details
-
 ## Installing the Chart
 
 To install the chart with the release name `hadoop`:
 
 ```bash
-helm helm repo add pfisterer-hadoop https://pfisterer.github.io/apache-hadoop-helm/
-helm install --name hadoop pfisterer-hadoop/hadoop
+git clone https://github.com/GingoBang/hadoop-demo.git
+helm install hadoop ./hadoop-demo
 ```
 
 ## Configuration
@@ -49,59 +38,3 @@ The following table lists the configurable parameters of the Hadoop chart and th
 | `persistence.dataNode.storageClass`    | Name of the StorageClass to use per your volume provider       | `-`                                                               |
 | `persistence.dataNode.accessMode`      | Access mode for the volume                                     | `ReadWriteOnce`                                                   |
 | `persistence.dataNode.size`            | Size of the volume                                             | `200Gi`                                                           |
-
-
----
-
-## Customized Hadoop Base Docker Image
-
-This image is modified from [comcast/kube-yarn](https://github.com/Comcast/kube-yarn/tree/add-hadoop-image-versions) and [mgit-at/helm-hadoop-3](https://github.com/mgit-at/helm-hadoop-3). Currently, native libraries are not been included.
-
-### Build and Push the Docker Image
-
-```bash
-# Set version
-HADOOP_VERSION=3.3.2
-
-# Build
-docker buildx build --push --platform "linux/arm64,linux/amd64" -t farberg/apache-hadoop:latest -t farberg/apache-hadoop:$HADOOP_VERSION .
-```
-
-### Testing with minikube
-
-If you are running locally with minikube and want to try your images without pushing them to a registry, build the images on the minikube VM first:
-
-```bash
-eval $(minikube docker-env)
-# use the build command from above
-```
-
----
-
-## Development
-
-Help is always appreciated. Please create pull requests.
-
-### Open Issues
-
-- Include native libraries
-- List of ports needs to be updated (cf. https://www.oreilly.com/library/view/big-data-analytics/9781788628846/5c5821cc-4a3d-498a-a3eb-23256cd79c8b.xhtml)
-
-### Upload a new version of the chart
-
-```bash
-helm lint
-helm package .
-mv hadoop*.tgz docs/
-helm repo index docs/ --url https://pfisterer.github.io/apache-hadoop-helm/
-git add docs/
-git commit -a -m "Updated helm repository"
-git push origin master
-```
-
-## Changes
-
-Version 1.2.0
-- Initial release of this chart
-- Use multi-architecture base image
-- Apache Hadoop 3.3.2
